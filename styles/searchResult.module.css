@@ -1,0 +1,44 @@
+.card {
+  list-style: none;
+  background-color: #ffffff06;
+  backdrop-filter: blur(4px);
+  border: 1px solid #fff4;
+  border-radius: .7em;
+  padding: 2em;
+  margin-block-start: 1em;
+}
+.card div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card .cardTitle {
+  padding-block-end: .5em;
+}
+.card .cardTitle h2 {
+  width: fit-content;
+  color: #fff5;
+  white-space: nowrap;
+}
+.card .tags,
+.card .location {
+  width: fit-content;
+  gap: .3em;
+  padding-block-end: .5em;
+}
+.card .tags span {
+  background-color: #fff3;
+  border-radius: .3em;
+  padding: .3em;
+}
+.card .description {
+  padding-block: .8em;
+  line-height: 1.3em;
+}
+.card .location {
+  display: inline-block;
+  padding-block-end: 0;
+}
+.card .location > span {
+  vertical-align: middle;
+}

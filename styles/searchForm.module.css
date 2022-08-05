@@ -1,0 +1,38 @@
+.form {
+  display: flex;
+  gap: .3em;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+}
+
+.input {
+  background-color: #3b3b3b;
+  color: #fffa;
+  font-size: 1.5em;
+  text-align: center;
+  flex-grow: 1;
+  flex-basis: 100px;
+  border: none;
+  border-radius: .3em;
+  outline: 2px solid #fff0;
+  outline-offset: -2px;
+  padding-block: .5em;
+  padding-inline: 0em;
+}
+.input:focus {
+  color: #fffd;
+  padding-inline: .5em;
+  outline-color: #fff4;
+}
+
+.formDisabledCover {
+  width: 100%;
+  height: 100%;
+  background-color: #0003;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: .5em;
+  z-index: 1;
+}
