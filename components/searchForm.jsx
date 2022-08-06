@@ -3,55 +3,61 @@ import styles from '../styles/searchForm.module.css';
 import { useEffect, useState } from 'react';
 import Loader from './loader';
 import loudIt from '../utils/loudIt';
+import { useRouter } from 'next/router';
 
-export default function SearchForm({
-	setSearchQuery,
-	searchQuery,
-	isSubmitting,
-	setIsSubmitting,
-}) {
-	const [jobValue, setJobValue] = useState('');
+export default function SearchForm({ query }) {
+	const router = useRouter();
+
+	const [searchValue, setSearchValue] = useState('');
 	const [locationValue, setLocationValue] = useState('');
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	useEffect(() => {
-		const { search, location } = searchQuery;
-		setJobValue(search || '');
+		if (!query) return;
+		const { search, location } = query;
+		setSearchValue(search || '');
 		setLocationValue(location || '');
 	}, []);
 
-	const handleSubmit = () => {
-		if (jobValue === '') {
+	const getQueryUrl = () => {
+		const formattedJob = searchValue?.replace(' ', '+');
+		const formattedLocation = locationValue?.replace(' ', '+');
+		const queryUrl =
+			formattedJob && formattedLocation
+				? `?search=${formattedJob}&location=${formattedLocation}`
+				: `?search=${formattedJob}`;
+
+		if (!formattedJob) return;
+
+		return queryUrl;
+	};
+
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		if (searchValue === '') {
 			loudIt('Put in a job search value', {
 				position: 'center',
 				background: '#646cff',
 			});
 			return;
 		}
+
+		const queryUrl = getQueryUrl();
+		if (!queryUrl || router.asPath.endsWith(queryUrl)) return;
+
 		setIsSubmitting(true);
-		setSearchQuery((searchQuery) => ({
-			...searchQuery,
-			job: jobValue,
-			location: locationValue,
-		}));
+		router.push(queryUrl).then(() => router.reload());
 	};
 
-	const handleEnterKeySubmit = (e) => e.which === 13 && handleSubmit();
-
 	return (
-		<form
-			className={styles.form}
-			onSubmit={(e) => {
-				e.preventDefault();
-				handleSubmit();
-			}}>
+		<form className={styles.form} onSubmit={handleSubmit}>
 			<input
 				className={styles.input}
 				type='text'
-				value={jobValue}
-				onInput={(e) => setJobValue(e.target.value)}
+				value={searchValue}
+				onInput={(e) => setSearchValue(e.target.value)}
 				placeholder='Search for jobs'
 				disabled={isSubmitting}
-				onKeyDown={handleEnterKeySubmit}
 			/>
 			<input
 				className={styles.input}
@@ -60,8 +66,10 @@ export default function SearchForm({
 				onInput={(e) => setLocationValue(e.target.value)}
 				placeholder='Search location'
 				disabled={isSubmitting}
-				onKeyDown={handleEnterKeySubmit}
 			/>
+			<button className={styles.button} type='submit'>
+				Search
+			</button>
 			{isSubmitting && (
 				<div className={styles.formDisabledCover}>
 					<Loader width='10em' height='.2em' />

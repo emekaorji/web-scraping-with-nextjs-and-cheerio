@@ -1,23 +1,7 @@
 import cheerio from 'cheerio';
 import axios from 'axios';
 
-async function getResults(job, location, pageNumber) {
-	const { data } = await axios.get(
-		`https://www.flexjobs.com/search?page=${pageNumber}&search=${job}&location=${location}`,
-		{
-			headers: {
-				'Access-Control-Allow-Origin': '*',
-			},
-		}
-	);
-	const $ = cheerio.load(data);
-
-	let results = [];
-	const jobsLength = $('#job-list li').length;
-	for (let i = 0; i < jobsLength; i++) {
-		results.push({});
-	}
-
+function updateResultsArray($, results) {
 	$('#job-list li').each(function (i, _elem) {
 		results[i].id = i + 1;
 	});
@@ -44,24 +28,27 @@ async function getResults(job, location, pageNumber) {
 	$('#job-list li .job-description').each(function (i, elem) {
 		results[i].jobDescription = $(elem).text().trim();
 	});
+}
 
-	const numberOfResults = parseInt(
-		$('.job-category-jobs > div:first-of-type h4')
-			?.text()
-			.replace(/\s/g, '')
-			.split('of')[1]
-			.split('for')[0]
+async function getResults(job, location, pageNumber) {
+	const { data } = await axios.get(
+		`https://www.flexjobs.com/search?page=${pageNumber}&search=${job}&location=${location}`
 	);
+	const $ = cheerio.load(data);
 
-	return { results, numberOfResults };
+	let results = [];
+	const jobsLength = $('#job-list li').length;
+	for (let i = 0; i < jobsLength; i++) {
+		results.push({});
+	}
+
+	updateResultsArray($, results);
+
+	return results;
 }
 
 export default async function getScrapedJobs(query) {
-	if (Object.keys(query).length === 0 || !query.search)
-		return {
-			results: [],
-			numberOfResults: 0,
-		};
+	if (Object.keys(query).length === 0 || !query.search) return [];
 
 	const job = await query.search?.replace(' ', '+');
 	const location = (await query.location?.replace(' ', '+')) || '';
